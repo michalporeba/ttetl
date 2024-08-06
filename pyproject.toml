@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "ttetl"
+version = "0.1.0"
+description = "Ticket Tailor API Python client for data analysis"
+authors = ["Michał Poręba <michalporeba@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests = "^2.32.3"
+requests-cache = "^1.2.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
