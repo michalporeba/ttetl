@@ -4,6 +4,12 @@ def get_ticket_groups_from(data):
 def get_ticket_types_from(data):
     return data.get('default_ticket_types', data.get('ticket_types', []))
 
+def get_int_value(property, data, default=None):
+  value = data.get(property, None)
+  if value is None:
+    return default
+  return int(value)
+
 class Event:
   def __init__(self, series, data):
     self.raw = data
@@ -12,6 +18,19 @@ class Event:
     self.name = series.name
     self.location_name = series.location_name
     self.location_postcode = series.location_postcode
+    self.start = {
+      "date": data.get('start', {}).get('date', ''),
+      "time": data.get('start', {}).get('time', ''),
+      "unix": data.get('start', {}).get('unix', '')
+    }
+    self.end = {
+      "date": data.get('end', {}).get('date', ''),
+      "time": data.get('end', {}).get('time', ''),
+      "unix": data.get('end', {}).get('unix', '')
+    }
+    self.tickets_available = data['tickets_available']
+    self.total_issued_tickets = data['total_issued_tickets']
+    self.unavailable = data['unavailable'] == 'true'
     ticket_types = { tt['id']: TicketType(tt) for tt in get_ticket_types_from(data)}
     self.ticket_groups = [TicketGroup(dtg) for dtg in get_ticket_groups_from(data)]
     for tg in self.ticket_groups:
@@ -47,8 +66,14 @@ class TicketGroup:
     self.id = data['id']
     self.name = data['name']
     self.ticket_ids = data['ticket_ids']
+    self.max_per_order = get_int_value('max_per_order', data)
+    self.min_per_order = get_int_value('min_per_order', data, 0)
+    self.price = get_int_value('price', data, 0)
+    self.quantity = get_int_value('quantity', data, 0)
+    self.quantity_held = get_int_value('quantity_held', data, 0)
+    self.quantity_issued = get_int_value('quantity_issued', data, 0)
+    self.quantity_total = get_int_value('quantity_total', data, 0)
     self.tickets = []
-
     #self.max_tickets = int(data.get('max_per_order', '0'))
 
   def __str__(self):
