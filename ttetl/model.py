@@ -31,14 +31,18 @@ class Event:
     self.tickets_available = data['tickets_available']
     self.total_issued_tickets = data['total_issued_tickets']
     self.unavailable = data['unavailable'] == 'true'
-    ticket_types = { tt['id']: TicketType(tt) for tt in get_ticket_types_from(data)}
+    types = { tt['id']: TicketType(tt) for tt in get_ticket_types_from(data)}
     self.ticket_groups = [TicketGroup(dtg) for dtg in get_ticket_groups_from(data)]
     for tg in self.ticket_groups:
       for tt in tg.ticket_ids:
-        tg.tickets.append(ticket_types[tt])
+        tg.ticket_types.append(types.pop(tt))
+    self.ticket_types = types.values()
+
+  def duration(self):
+    return (self.end["unix"] - self.start["unix"])/60/60
 
   def __str__(self):
-    return f'EVENT: {self.name} [{self.id}]'
+    return f'EVENT: {self.name} ({self.start["date"]}) {self.duration()} hours [{self.id}]'
 
 class EventSeries:
   def __init__(self, data):
@@ -67,23 +71,26 @@ class TicketGroup:
     self.name = data['name']
     self.ticket_ids = data['ticket_ids']
     self.max_per_order = get_int_value('max_per_order', data)
-    self.min_per_order = get_int_value('min_per_order', data, 0)
+    self.min_per_order = get_int_value('min_per_order', data, self.max_per_order)
     self.price = get_int_value('price', data, 0)
-    self.quantity = get_int_value('quantity', data, 0)
-    self.quantity_held = get_int_value('quantity_held', data, 0)
-    self.quantity_issued = get_int_value('quantity_issued', data, 0)
-    self.quantity_total = get_int_value('quantity_total', data, 0)
-    self.tickets = []
-    #self.max_tickets = int(data.get('max_per_order', '0'))
+    self.ticket_types = []
+
+  def quantity_issued(self):
+    return sum([t.quantity_issued for t in self.ticket_types])
 
   def __str__(self):
-    return f'TICKET GROUP: {self.name} [{self.id}]'
-  
+    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.min_per_order}'
+
 
 class TicketType:
   def __init__(self, data):
     self.id = data['id']
     self.name = data['name']
+    self.price = get_int_value('price', data, 0)
+    self.quantity_available = get_int_value('quantity', data, 0)
+    self.quantity_held = get_int_value('quantity_held', data, 0)
+    self.quantity_issued = get_int_value('quantity_issued', data, 0)
+    self.quantity_total = get_int_value('quantity_total', data, 0)
 
   def __str__(self):
-    return f'TICKET TYPE: {self.name} [{self.id}]'
+    return f'TICKET TYPE: {self.name} [{self.id}] {self.quantity_issued}/{self.quantity_total}'
