@@ -13,11 +13,6 @@ def main():
         for t in tg.ticket_types:
           print(t)
 
-      if len(e.ticket_types)>0:
-        print('UNGROUPED')
-        for t in e.ticket_types:
-          print(t)
-
       print('-------------------------')
 
 

@@ -36,7 +36,15 @@ class Event:
     for tg in self.ticket_groups:
       for tt in tg.ticket_ids:
         tg.ticket_types.append(types.pop(tt))
-    self.ticket_types = types.values()
+
+    if (len(types)>0):
+      other_group = TicketGroup({
+        'id': 'other',
+        'name': 'Other',
+        'ticket_ids': list(types.keys())
+      })
+      other_group.ticket_types = types.values()
+      self.ticket_groups.append(other_group)
 
   def duration(self):
     return (self.end["unix"] - self.start["unix"])/60/60
@@ -71,15 +79,22 @@ class TicketGroup:
     self.name = data['name']
     self.ticket_ids = data['ticket_ids']
     self.max_per_order = get_int_value('max_per_order', data)
-    self.min_per_order = get_int_value('min_per_order', data, self.max_per_order)
+    self.min_per_order = get_int_value('min_per_order', data)
     self.price = get_int_value('price', data, 0)
     self.ticket_types = []
+
+  def quantity_required(self):
+    if not self.min_per_order is None:
+      return self.min_per_order
+    if not self.max_per_order is None:
+      return self.max_per_order
+    return sum([t.quantity_total for t in self.ticket_types])
 
   def quantity_issued(self):
     return sum([t.quantity_issued for t in self.ticket_types])
 
   def __str__(self):
-    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.min_per_order}'
+    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.quantity_required()}'
 
 
 class TicketType:
