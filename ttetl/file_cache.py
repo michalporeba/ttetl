@@ -41,4 +41,6 @@ class FileCache:
       if not filename.endswith('.json') or not os.path.isfile(file_path):
          continue
       with open(file_path, 'r') as f:
-         yield Event(json.load(f)['data'])
+         event = Event(json.load(f)['data'])
+         if timestamp is None or event.start.unix >= timestamp:
+            yield event

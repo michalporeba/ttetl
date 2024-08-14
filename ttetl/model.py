@@ -10,11 +10,13 @@ def get_int_value(property, data, default=None):
     return default
   return int(value)
 
+
 class TimePoint:
   def __init__(self, data):
     self.date = data.get('date', '')
     self.time = data.get('time', '')
     self.unix = data.get('unix', '')
+
 
 class Event:
   def __init__(self, data):
@@ -132,7 +134,39 @@ class TicketGroup:
     return sum([t.quantity_issued for t in self.ticket_types])
 
   def __str__(self):
-    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.quantity_total()}'
+    identity = f'[{self.id}] {self.name}'
+    levels = f'[{self.quantity_issued()}/{self.quantity_total()}]'
+    return f'TICKET GROUP: {identity} {levels}'
+
+
+class TicketGroupAggregate:
+  def __init__(self, name):
+    self.name = name
+    self.count = 0
+    self.elements = []
+    self.ticket_ids = []
+    self.ticket_types = []
+
+  def add(self, other):
+    self.count += 1
+    self.ticket_ids += other.ticket_ids
+    self.elements.append(other)
+
+    current = { tt.name: tt for tt in self.ticket_types }
+    for tt in other.ticket_types:
+      if not tt.name in current.keys():
+        current[tt.name] = TicketTypeAggregate(tt.name)
+      current[tt.name].add(tt)
+    self.ticket_types = current.values()
+
+  def quantity_total(self):
+    return sum([t.quantity_total() for t in self.elements])
+
+  def quantity_issued(self):
+    return sum([t.quantity_issued() for t in self.elements])
+
+  def __str__(self):
+    return f'TICKET GROUP: {self.name} [{self.quantity_issued()}/{self.quantity_total()}]'
 
 
 class TicketType:
@@ -147,3 +181,24 @@ class TicketType:
 
   def __str__(self):
     return f'TICKET TYPE: {self.name} [{self.id}] {self.quantity_issued}/{self.quantity_total}'
+
+class TicketTypeAggregate:
+  def __init__(self, name):
+    self.name = name
+    self.count = 0
+    self.elements = []
+    self.quantity_available = 0
+    self.quantity_held = 0
+    self.quantity_issued = 0
+    self.quantity_total = 0
+
+  def add(self, ticket_type):
+    self.elements.append(ticket_type)
+    self.count += 1
+    self.quantity_available += ticket_type.quantity_available
+    self.quantity_held += ticket_type.quantity_held
+    self.quantity_issued += ticket_type.quantity_issued
+    self.quantity_total += ticket_type.quantity_total
+
+  def __str__(self):
+    return f'TICKET TYPE: {self.name} [{self.quantity_issued}/{self.quantity_total}]'
