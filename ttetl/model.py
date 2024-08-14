@@ -19,7 +19,7 @@ class TimePoint:
 class Event:
   def __init__(self, data):
     self.raw = data
-    self.add_series_data(data.get('series', {}))
+    self.add_series_data(data.get('_series', {}))
 
     self.id = data['id']
     self.event_series_id = data['event_series_id']
@@ -95,7 +95,7 @@ class EventSeries:
     self.location_postcode = data.get('venue', {}).get('postal_code', '')
 
   def _data_for_event(self):
-    return { 'series': {
+    return { '_series': {
       'description': self.description,
       'name': self.name,
       'location_name': self.location_name,

@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from model import Event
 
 class FileCache:
   def __init__(self, path='data'):
@@ -29,3 +30,15 @@ class FileCache:
         return 0
      with open(path, 'r') as f:
         return int(f.read())
+
+  def stream_events(self, timestamp=None):
+    folder_path = f'{self.path}/events'
+    if not os.path.exists(folder_path):
+      return
+
+    for filename in os.listdir(folder_path):
+      file_path = os.path.join(folder_path, filename)
+      if not filename.endswith('.json') or not os.path.isfile(file_path):
+         continue
+      with open(file_path, 'r') as f:
+         yield Event(json.load(f)['data'])

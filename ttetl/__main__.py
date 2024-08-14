@@ -16,8 +16,15 @@ def get_events_from_api(timestamp=None):
     fc.save_event_series_timestamp(es)
 
 
+def stream_events_from_cache(timestamp=None):
+  fc = FileCache()
+  for e in fc.stream_events(timestamp):
+    print(e)
+
+
 def main():
-  get_events_from_api(1722000587) #1722000587
+  #get_events_from_api() #1722000587
+  stream_events_from_cache()
 
 
 if __name__ == '__main__':
