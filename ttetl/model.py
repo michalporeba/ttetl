@@ -10,47 +10,77 @@ def get_int_value(property, data, default=None):
     return default
   return int(value)
 
+class TimePoint:
+  def __init__(self, data):
+    self.date = data.get('date', '')
+    self.time = data.get('time', '')
+    self.unix = data.get('unix', '')
+
 class Event:
-  def __init__(self, series, data):
+  def __init__(self, data):
     self.raw = data
+    self.add_series_data(data.get('series', {}))
+
     self.id = data['id']
-    self.description = series.description
-    self.name = series.name
-    self.location_name = series.location_name
-    self.location_postcode = series.location_postcode
-    self.start = {
-      "date": data.get('start', {}).get('date', ''),
-      "time": data.get('start', {}).get('time', ''),
-      "unix": data.get('start', {}).get('unix', '')
-    }
-    self.end = {
-      "date": data.get('end', {}).get('date', ''),
-      "time": data.get('end', {}).get('time', ''),
-      "unix": data.get('end', {}).get('unix', '')
-    }
+    self.event_series_id = data['event_series_id']
+    self.start = TimePoint(data.get('start', {}))
+    self.end = TimePoint(data.get('end', {}))
+
     self.tickets_available = data['tickets_available']
     self.total_issued_tickets = data['total_issued_tickets']
     self.unavailable = data['unavailable'] == 'true'
+
+    self.group_tickets_from_data(data)
+
+
+  def add_series_data(self, data):
+    self.description = data.get('description')
+    self.name = data.get('name')
+    self.location_name = data.get('location_name')
+    self.location_postcode = data.get('location_postcode')
+    self.series_is_published = data.get('series_is_published', False)
+    self.series_is_private = data.get('series_is_private', False)
+
+
+  def add_other_tickets_group(self, other_ticket_types):
+    if (len(other_ticket_types)>0):
+      other_group = TicketGroup({
+        'id': 'other',
+        'name': 'Other',
+        'ticket_ids': list(other_ticket_types.keys())
+      })
+      other_group.ticket_types = other_ticket_types.values()
+      self.ticket_groups.append(other_group)
+
+
+  def group_tickets_from_data(self, data):
     types = { tt['id']: TicketType(tt) for tt in get_ticket_types_from(data)}
     self.ticket_groups = [TicketGroup(dtg) for dtg in get_ticket_groups_from(data)]
     for tg in self.ticket_groups:
       for tt in tg.ticket_ids:
         tg.ticket_types.append(types.pop(tt))
 
-    if (len(types)>0):
-      other_group = TicketGroup({
-        'id': 'other',
-        'name': 'Other',
-        'ticket_ids': list(types.keys())
-      })
-      other_group.ticket_types = types.values()
-      self.ticket_groups.append(other_group)
+    self.add_other_tickets_group(types)
+
 
   def duration(self):
-    return (self.end["unix"] - self.start["unix"])/60/60
+    return round((self.end.unix - self.start.unix)/60/60, 2)
+
+
+  def quantity_total(self):
+    return sum([tg.quantity_total() for tg in self.ticket_groups])
+
+
+  def quantity_issued(self):
+    return sum([tg.quantity_issued() for tg in self.ticket_groups])
+
 
   def __str__(self):
-    return f'EVENT: {self.name} ({self.start["date"]}) {self.duration()} hours [{self.id}]'
+    identity = f'[{self.id}] {self.name} ({self.start.date})'
+    duration = f'{self.duration()} hours'
+    levels = f'[{self.quantity_issued()}/{self.quantity_total()}]'
+    return f'EVENT: {identity} - {duration} - {levels}'
+
 
 class EventSeries:
   def __init__(self, data):
@@ -63,11 +93,19 @@ class EventSeries:
     self.is_private = data['private'] == 'true'
     self.location_name = data.get('venue', {}).get('name', '')
     self.location_postcode = data.get('venue', {}).get('postal_code', '')
-    #self.ticket_groups = [TicketGroup(dtg) for dtg in get_ticket_groups_from(data)]
-    #self.ticket_types = [TicketType(tt) for tt in get_ticket_types_from(data)]
+
+  def _data_for_event(self):
+    return { 'series': {
+      'description': self.description,
+      'name': self.name,
+      'location_name': self.location_name,
+      'location_postcode': self.location_postcode,
+      'series_is_published': self.is_published,
+      'series_is_private': self.is_private
+    }}
 
   def create_event(self, data):
-    return Event(self, data)
+    return Event({**self._data_for_event(), **data})
 
   def __str__(self):
     return f'EVENT SERIES: {self.name} [{self.id}]'
@@ -83,7 +121,7 @@ class TicketGroup:
     self.price = get_int_value('price', data, 0)
     self.ticket_types = []
 
-  def quantity_required(self):
+  def quantity_total(self):
     if not self.min_per_order is None:
       return self.min_per_order
     if not self.max_per_order is None:
@@ -94,7 +132,7 @@ class TicketGroup:
     return sum([t.quantity_issued for t in self.ticket_types])
 
   def __str__(self):
-    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.quantity_required()}'
+    return f'TICKET GROUP: {self.name} [{self.id}] {self.quantity_issued()}/{self.quantity_total()}'
 
 
 class TicketType:
