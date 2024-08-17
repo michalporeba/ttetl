@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from model import Event
+from ttetl.tt_model import Event
 
 class FileCache:
   def __init__(self, path='data'):

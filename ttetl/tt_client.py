@@ -2,7 +2,7 @@ import os
 import requests
 import requests_cache
 import time
-from model import Event, EventSeries
+from ttetl.tt_model import Event, EventSeries
 
 BATCH_SIZE = 100
 HEADERS = {

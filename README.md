@@ -13,6 +13,11 @@ api_key = '...your.api.key.here...'
 tt = TTClient(api_key)
 ```
 
+Process events
+```python
+  
+```
+
 Process event series and events
 ```python
 for es in tt.stream_event_series(timestamp):

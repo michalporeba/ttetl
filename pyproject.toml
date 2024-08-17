@@ -10,6 +10,8 @@ readme = "README.md"
 python = "^3.12"
 requests = "^2.32.3"
 requests-cache = "^1.2.1"
+click = "^8.1.7"
+logging = "^0.4.9.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
