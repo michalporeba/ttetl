@@ -1,7 +1,10 @@
 from tt_client import TTClient
 from file_cache import FileCache
 from ttetl.tt_model import TicketGroupAggregate
+from actions import get_config
+from cli_printer import CliPrinter
 
+printer = CliPrinter()
 
 def get_events_from_api(timestamp=None):
   fc = FileCache()
@@ -76,3 +79,7 @@ def test1():
 
 def show_cache_stats():
   print('SHOWING CACHE STATS')
+
+
+def show_config():
+  get_config().accept_printer(printer)

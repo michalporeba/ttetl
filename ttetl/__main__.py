@@ -17,5 +17,9 @@ def show():
 def cache():
   show_cache_stats()
 
+@show.command()
+def config():
+  show_config()
+
 if __name__ == '__main__':
   cli()
