@@ -15,7 +15,6 @@ tt = TTClient(api_key)
 
 Process events
 ```python
-  
 ```
 
 Process event series and events
@@ -29,3 +28,4 @@ for es in tt.stream_event_series(timestamp):
       for t in tg.ticket_types:
         print(t)
 ```
+
