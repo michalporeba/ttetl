@@ -5,6 +5,9 @@ from cli_printer import CliPrinter
 from actions import get_config
 from options import TtetlOptions
 import os
+import logging
+import re
+logger = logging.getLogger(__name__)
 
 printer = CliPrinter()
 
@@ -94,3 +97,20 @@ def create_config(path):
   full_path = os.path.join(current_dir, path)
   print(f'getting config from {full_path}')
   return get_config(full_path)
+
+def configure_logging(options :TtetlOptions) -> None:
+  level = options.logging.level.upper()
+  message_format='%(asctime)s %(levelname)s: %(message)s',
+  message_format='%(asctime)s [%(levelname)s] %(message)s'
+  date_format='%H:%M:%S'
+  formatter = logging.Formatter(message_format, datefmt=date_format)
+
+  if re.match('console', options.logging.target, re.IGNORECASE):
+    logging.basicConfig(level=level, format=message_format, datefmt=date_format)
+  else:
+    logging.basicConfig(
+      filename=options.logging.target,
+      level=level,
+      format=message_format,
+      datefmt=date_format
+    )

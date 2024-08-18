@@ -1,6 +1,8 @@
 import click
 from options import TtetlOptions
 from ttetl.cli_actions import *
+import logging
+logger = logging.getLogger(__name__)
 
 @click.group()
 @click.option('--config', '-c', help='Use a configuration file')
@@ -14,6 +16,9 @@ def cli(ctx, config, verbose, debug):
     ctx.obj.set_verbose()
   if debug:
     ctx.obj.set_debug()
+
+  configure_logging(ctx.obj)
+  logging.debug(f'Using {ctx.obj.source} configuration')
 
 @cli.command()
 def test():
