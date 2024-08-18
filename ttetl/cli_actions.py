@@ -1,8 +1,10 @@
 from tt_client import TTClient
 from file_cache import FileCache
 from ttetl.tt_model import TicketGroupAggregate
-from actions import get_config
 from cli_printer import CliPrinter
+from actions import get_config
+from options import TtetlOptions
+import os
 
 printer = CliPrinter()
 
@@ -77,9 +79,18 @@ def test1():
   print("Hello")
 
 
-def show_cache_stats():
+def show_cache_stats(options):
   print('SHOWING CACHE STATS')
 
 
-def show_config():
-  get_config().accept_printer(printer)
+def show_config(options):
+  options.accept_printer(printer)
+
+def create_config(path):
+  if not path:
+    return TtetlOptions()
+
+  current_dir = os.getcwd()
+  full_path = os.path.join(current_dir, path)
+  print(f'getting config from {full_path}')
+  return get_config(full_path)

@@ -3,7 +3,7 @@ from dataclasses import dataclass, field, asdict
 def default_values():
   return {
     "logging": {
-      "level": "DEBUG",
+      "level": "WARNING",
       "target": "console"
     },
     "api": {
@@ -17,9 +17,10 @@ def default_values():
   }
 
 class TtetlOptions:
-  def __init__(self, options = {}):
+  def __init__(self, options = {}, source='DEFAULTS'):
     resolved = default_values()
     resolved.update(options)
+    self.source = source
     self.api = ApiOptions(**resolved['api'])
     self.data = DataOptions(**resolved['data'])
     self.logging = LoggingOptions(**resolved['logging'])
@@ -34,10 +35,16 @@ class TtetlOptions:
         'logging': asdict(self.logging)
      }
 
+  def set_verbose(self):
+     self.logging.level = 'INFO'
+
+  def set_debug(self):
+     self.logging.level = 'DEBUG'
+
 @dataclass
 class ApiOptions:
     keys: list = field(default_factory=list)
-    source: str = "None"
+    source: str = 'None'
     cache_duration: int = 3600
 
 @dataclass
@@ -46,5 +53,5 @@ class DataOptions:
 
 @dataclass
 class LoggingOptions:
-    level: str = "DEBUG"
-    target: str = "console"
+    level: str = 'WARNING'
+    target: str = 'console'

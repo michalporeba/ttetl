@@ -4,5 +4,4 @@ from printer import Printer
 
 class CliPrinter(Printer):
   def print_options(self, options: TtetlOptions) -> None:
-    print("OPTIONS")
     print(json.dumps(options.to_dict(), indent=2))

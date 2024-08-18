@@ -1,25 +1,38 @@
 import click
+from options import TtetlOptions
 from ttetl.cli_actions import *
 
 @click.group()
-def cli():
-  pass
+@click.option('--config', '-c', help='Use a configuration file')
+@click.option('--verbose', is_flag=True, help='Enable verbose output')
+@click.option('--debug', is_flag=True, help='Enable debug output')
+@click.pass_context
+def cli(ctx, config, verbose, debug):
+  ctx.obj = create_config(config)
+
+  if verbose:
+    ctx.obj.set_verbose()
+  if debug:
+    ctx.obj.set_debug()
 
 @cli.command()
 def test():
   test1()
 
 @cli.group()
-def show():
+@click.pass_context
+def show(ctx):
   pass
 
 @show.command()
-def cache():
-  show_cache_stats()
+@click.pass_context
+def cache(ctx):
+  show_cache_stats(ctx.obj)
 
 @show.command()
-def config():
-  show_config()
+@click.pass_context
+def config(ctx):
+  show_config(ctx.obj)
 
 if __name__ == '__main__':
-  cli()
+  cli(obj=None)
