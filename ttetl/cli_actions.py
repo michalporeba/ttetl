@@ -100,10 +100,8 @@ def create_config(path):
 
 def configure_logging(options :TtetlOptions) -> None:
   level = options.logging.level.upper()
-  message_format='%(asctime)s %(levelname)s: %(message)s',
   message_format='%(asctime)s [%(levelname)s] %(message)s'
   date_format='%H:%M:%S'
-  formatter = logging.Formatter(message_format, datefmt=date_format)
 
   if re.match('console', options.logging.target, re.IGNORECASE):
     logging.basicConfig(level=level, format=message_format, datefmt=date_format)
