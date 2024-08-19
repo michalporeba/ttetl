@@ -82,10 +82,6 @@ def main():
     get_ticket_groups(events)
 
 
-def test1():
-    print("Hello")
-
-
 def show_cache_stats(options):
     print("SHOWING CACHE STATS")
 
@@ -96,7 +92,12 @@ def show_config(options):
 
 def create_config(path):
     if not path:
-        return TtetlOptions()
+        options = TtetlOptions()
+        api_keys: str = os.environ.get("TICKET_TAILOR_API")
+        if api_keys is not None:
+            keys_list = [key.strip() for key in api_keys.split(',')]
+            options.add_api_keys(keys_list, "ENV:TICKET_TAILOR_API")
+        return options
 
     current_dir = os.getcwd()
     full_path = os.path.join(current_dir, path)

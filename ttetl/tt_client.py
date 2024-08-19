@@ -68,6 +68,3 @@ class TTClient:
         )
         return None
 
-    def build():
-        api_key = os.environ["TICKET_TAILOR_API"]
-        return TTClient(api_key)

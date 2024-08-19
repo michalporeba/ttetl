@@ -12,13 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
+@click.option("--api-key", help="Use a specific API key")
 @click.option("--config", "-c", help="Use a configuration file")
 @click.option("--verbose", is_flag=True, help="Enable verbose output")
 @click.option("--debug", is_flag=True, help="Enable debug output")
 @click.pass_context
-def cli(ctx, config, verbose, debug):
+def cli(ctx, api_key, config, verbose, debug):
     ctx.obj = create_config(config)
 
+    if api_key:
+        ctx.obj.add_api_keys([api_key], "CLI parameter")
     if verbose:
         ctx.obj.set_verbose()
     if debug:
