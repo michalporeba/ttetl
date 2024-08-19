@@ -1,6 +1,8 @@
 import os
-import requests_cache
 import time
+
+import requests_cache
+
 from ttetl.tt_model import EventSeries
 
 BATCH_SIZE = 100

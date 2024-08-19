@@ -1,4 +1,5 @@
 import json
+
 from options import TtetlOptions
 from printer import Printer
 

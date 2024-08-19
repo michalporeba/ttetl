@@ -1,6 +1,7 @@
-import os
 import json
+import os
 import time
+
 from ttetl.tt_model import Event
 
 

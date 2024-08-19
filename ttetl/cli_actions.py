@@ -1,12 +1,14 @@
-from tt_client import TTClient
-from file_cache import FileCache
-from ttetl.tt_model import TicketGroupAggregate
-from cli_printer import CliPrinter
-from actions import get_config
-from options import TtetlOptions
-import os
 import logging
+import os
 import re
+
+from actions import get_config
+from cli_printer import CliPrinter
+from file_cache import FileCache
+from options import TtetlOptions
+from tt_client import TTClient
+
+from ttetl.tt_model import TicketGroupAggregate
 
 logger = logging.getLogger(__name__)
 

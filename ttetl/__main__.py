@@ -1,6 +1,12 @@
 import click
-from ttetl.cli_actions import *
 import logging
+
+from ttetl.cli_actions import (
+    configure_logging,
+    create_config,
+    show_cache_stats,
+    show_config,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +26,6 @@ def cli(ctx, config, verbose, debug):
 
     configure_logging(ctx.obj)
     logging.debug(f"Using {ctx.obj.source} configuration")
-
-
-@cli.command()
-def test():
-    test1()
 
 
 @cli.group()
