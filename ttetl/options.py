@@ -1,6 +1,5 @@
 from dataclasses import asdict, dataclass, field
 
-
 def default_values():
     return {
         "logging": {"level": "WARNING", "target": "console"},
@@ -30,12 +29,15 @@ class TtetlOptions:
     def accept_printer(self, printer) -> None:
         printer.print_options(self)
 
-    def to_dict(self) -> dict:
+    def to_dict(self):
         return {
             "api": asdict(self.api),
             "data": asdict(self.data),
             "logging": asdict(self.logging),
         }
+
+    def set_data_location(self, location: str) -> None:
+        self.data.location = location
 
     def set_verbose(self) -> None:
         self.logging.level = "INFO"
