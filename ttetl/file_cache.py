@@ -2,6 +2,7 @@ import json
 import os
 import time
 
+from model import CacheStats
 from ttetl.tt_model import Event
 
 
@@ -43,3 +44,7 @@ class FileCache:
                 event = Event(json.load(f)["data"])
                 if timestamp is None or event.start.unix >= timestamp:
                     yield event
+
+
+    def get_stats(self) -> CacheStats:
+        return CacheStats(entities = [], location = self.path)

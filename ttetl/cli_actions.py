@@ -2,7 +2,7 @@ import logging
 import os
 import re
 
-from actions import get_config
+from actions import (get_cache_stats, get_config)
 from cli_printer import CliPrinter
 from file_cache import FileCache
 from options import TtetlOptions
@@ -83,8 +83,8 @@ def main():
 
 
 def show_cache_stats(options):
-    print("SHOWING CACHE STATS")
-
+    stats = get_cache_stats(options)
+    stats.accept_printer(printer)
 
 def show_config(options):
     options.accept_printer(printer)
@@ -95,7 +95,7 @@ def create_config(path):
         options = TtetlOptions()
         api_keys: str = os.environ.get("TICKET_TAILOR_API")
         if api_keys is not None:
-            keys_list = [key.strip() for key in api_keys.split(',')]
+            keys_list = [key.strip() for key in api_keys.split(",")]
             options.add_api_keys(keys_list, "ENV:TICKET_TAILOR_API")
         return options
 

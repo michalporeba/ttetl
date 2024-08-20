@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass, field
 
+
 def default_values():
     return {
         "logging": {"level": "WARNING", "target": "console"},
@@ -8,7 +9,7 @@ def default_values():
             "keys_source": "None",
             "cache_duration": 3600,
             "delay_seconds": 0.05,
-            "url_base": "https://api.tickettailor.com/v1"
+            "url_base": "https://api.tickettailor.com/v1",
         },
         "data": {"location": "./data"},
     }
