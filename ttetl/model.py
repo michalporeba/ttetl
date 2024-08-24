@@ -6,8 +6,8 @@ from typing import List
 class CachedEntity:
     name: str
     count: int
-    first_timestamp: int
-    last_timestamp: int
+    first: int
+    last: int
 
 
 @dataclass

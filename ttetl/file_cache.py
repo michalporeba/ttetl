@@ -2,8 +2,21 @@ import json
 import os
 import time
 
-from model import CacheStats
+from model import CacheStats, CachedEntity
 from ttetl.tt_model import Event
+
+
+def stream_data_from(path):
+    if not os.path.exists(path):
+        return
+
+    for filename in os.listdir(path):
+            file_path = os.path.join(path, filename)
+            if not filename.endswith(".json") or not os.path.isfile(file_path):
+                continue
+
+            with open(file_path, "r") as f:
+                yield json.load(f)
 
 
 class FileCache:
@@ -32,19 +45,23 @@ class FileCache:
             return int(f.read())
 
     def stream_events(self, timestamp=None):
-        folder_path = f"{self.path}/events"
-        if not os.path.exists(folder_path):
-            return
-
-        for filename in os.listdir(folder_path):
-            file_path = os.path.join(folder_path, filename)
-            if not filename.endswith(".json") or not os.path.isfile(file_path):
-                continue
-            with open(file_path, "r") as f:
-                event = Event(json.load(f)["data"])
-                if timestamp is None or event.start.unix >= timestamp:
-                    yield event
-
+        for data in stream_data_from(f"{self.path}/events"):
+            event = Event(data["data"])
+            if timestamp is None or event.start.unix >= timestamp:
+                yield event
 
     def get_stats(self) -> CacheStats:
-        return CacheStats(entities = [], location = self.path)
+        stats = CacheStats(location = self.path)
+        first = None
+        last = None
+        count = 0
+        for data in stream_data_from(f"{self.path}/events"):
+            ts = data["timestamp"]
+            if first is None or first > ts:
+                first = ts
+            if last is None or last < ts:
+                last = ts
+            count += 1
+
+        stats.entities.append(CachedEntity(name="Events", count=count, first=first, last=last))
+        return stats
