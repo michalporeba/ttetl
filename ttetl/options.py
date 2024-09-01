@@ -7,6 +7,7 @@ def default_values():
         "api": {
             "keys": [],
             "keys_source": "None",
+            "batch_size": 100,
             "cache_duration": 3600,
             "delay_seconds": 0.05,
             "url_base": "https://api.tickettailor.com/v1",
@@ -55,6 +56,7 @@ class TtetlOptions:
 class ApiOptions:
     keys: list = field(default_factory=list)
     keys_source: str = "None"
+    batch_size: int = 100
     cache_duration: int = 3600
     delay_seconds: int = 0.05
     url_base: str = "https://api.tickettailor.com/v1"

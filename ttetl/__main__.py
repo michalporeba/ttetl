@@ -4,6 +4,7 @@ import logging
 from ttetl.cli_actions import (
     configure_logging,
     create_config,
+    fetch_all,
     show_cache_stats,
     show_config,
 )
@@ -51,6 +52,17 @@ def cache(ctx):
 def config(ctx):
     show_config(ctx.obj)
 
+
+@cli.group()
+@click.pass_context
+def fetch(ctx):
+    pass
+
+
+@fetch.command()
+@click.pass_context
+def all(ctx):
+    fetch_all(ctx.obj)
 
 if __name__ == "__main__":
     cli(obj=None)

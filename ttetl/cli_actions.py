@@ -1,12 +1,13 @@
+import click
 import logging
 import os
 import re
+import time
 
-from actions import (get_cache_stats, get_config)
+from actions import (get_cache_stats, get_config, get_events_from_api)
 from cli_printer import CliPrinter
 from file_cache import FileCache
 from options import TtetlOptions
-from tt_client import TTClient
 
 from ttetl.tt_model import TicketGroupAggregate
 
@@ -14,20 +15,10 @@ logger = logging.getLogger(__name__)
 
 printer = CliPrinter()
 
-
-def get_events_from_api(timestamp=None):
-    fc = FileCache()
-    tt = TTClient.build()
-
-    if timestamp is None:
-        timestamp = fc.get_event_series_timestamp()
-
-    for es in tt.stream_event_series(timestamp):
-        for e in tt.stream_events_in_series(es):
-            print(e)
-            fc.save_event(e)
-        fc.save_event_series_timestamp(es)
-
+def _format_time(seconds):
+    minutes = seconds // 60
+    seconds = seconds % 60
+    return f"{minutes:02d}:{seconds:02d}"
 
 def stream_events_from_cache(timestamp=None):
     fc = FileCache()
@@ -82,14 +73,6 @@ def main():
     get_ticket_groups(events)
 
 
-def show_cache_stats(options):
-    stats = get_cache_stats(options)
-    stats.accept_printer(printer)
-
-def show_config(options):
-    options.accept_printer(printer)
-
-
 def create_config(path):
     if not path:
         options = TtetlOptions()
@@ -119,3 +102,27 @@ def configure_logging(options: TtetlOptions) -> None:
             format=message_format,
             datefmt=date_format,
         )
+
+
+def show_cache_stats(options):
+    stats = get_cache_stats(options)
+    stats.accept_printer(printer)
+
+
+def show_config(options):
+    options.accept_printer(printer)
+
+
+def fetch_all(options):
+    click.echo("Fetching data from Ticket Tailor")
+    events = 0
+    start_time = int(time.time())
+
+    for e in get_events_from_api(options.api, 1722000587):
+        events += 1
+        t = f"[{_format_time(int(time.time()-start_time))}]"
+        message = f"{t} Fetched {events} events..."
+        click.echo(message, nl=False)
+        click.echo("\b" * len(message), nl=False)
+
+    click.echo("\nDone!")
