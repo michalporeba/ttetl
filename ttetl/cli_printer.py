@@ -4,7 +4,7 @@ import time
 from model import CacheStats
 from options import TtetlOptions
 from printer import Printer
-
+from utils import format_duration
 
 class CliPrinter(Printer):
     def print_options(self, options: TtetlOptions) -> None:
@@ -15,4 +15,6 @@ class CliPrinter(Printer):
         print(f"{'ENTITY':<10}{'COUNT':>7}{'OLDEST':>12}{'YOUNGEST':>12}")
         now = int(time.time())
         for e in stats.entities:
-            print(f"{e.name:<10}{e.count:>7}{now-e.first:>12}{now-e.last:>12}")
+            first = format_duration(now-e.first)
+            last = format_duration(now-e.last)
+            print(f"{e.name:<10}{e.count:>7}{first:>12}{last:>12}")

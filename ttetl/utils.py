@@ -7,7 +7,6 @@ def format_duration(seconds: int) -> str:
     s = seconds % 60
 
     if seconds >= 60*60:
-        print("here")
         return f"{h:02d}:{m:02d}:{s:02d}"
 
     return f"{m:02d}:{s:02d}"

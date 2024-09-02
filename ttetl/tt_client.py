@@ -1,11 +1,13 @@
-import os
+import logging
 import time
 
 import requests_cache
 
+from datetime import timedelta
 from ttetl.tt_model import EventSeries
 from options import ApiOptions
 
+logger = logging.getLogger(__name__)
 HEADERS = {"Accept": "application/json"}
 
 def get_time_limit(timestamp):
@@ -41,7 +43,8 @@ class TTClient:
         self.options = options
         self.api_key = options.keys[0]
         self.auth = (self.api_key, "")
-        self.session = requests_cache.CachedSession("demo_cache")
+        self.session = requests_cache.CachedSession()
+        self.session.cache.delete(older_than=timedelta(seconds=options.cache_seconds))
 
     def stream_event_series(self, timestamp=None):
         for d in stream_data(
