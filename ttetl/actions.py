@@ -37,3 +37,10 @@ def get_events_from_api(options: ApiOptions, timestamp=None):
             logger.info(f'fetched: {e}')
             yield e
         fc.save_event_series_timestamp(es)
+
+
+def stream_events_from_cache(timestamp=None):
+    fc = FileCache()
+    for e in fc.stream_events(timestamp):
+        print(e)
+        yield e

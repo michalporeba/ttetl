@@ -4,7 +4,12 @@ import os
 import re
 import time
 
-from actions import (get_cache_stats, get_config, get_events_from_api)
+from actions import (
+    get_cache_stats,
+    get_config,
+    get_events_from_api,
+    stream_events_from_cache
+)
 from cli_printer import CliPrinter
 from file_cache import FileCache
 from options import TtetlOptions
@@ -15,12 +20,6 @@ from ttetl.tt_model import TicketGroupAggregate
 logger = logging.getLogger(__name__)
 
 printer = CliPrinter()
-
-def stream_events_from_cache(timestamp=None):
-    fc = FileCache()
-    for e in fc.stream_events(timestamp):
-        print(e)
-        yield e
 
 
 def get_ticket_groups(events):
@@ -107,6 +106,11 @@ def show_cache_stats(options):
 
 def show_config(options):
     options.accept_printer(printer)
+
+
+def cli_show_events(options):
+    for e in stream_events_from_cache():
+        print(e)
 
 
 def fetch_all(options):

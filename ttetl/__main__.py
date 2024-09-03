@@ -7,6 +7,7 @@ from ttetl.cli_actions import (
     fetch_all,
     show_cache_stats,
     show_config,
+    cli_show_events
 )
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,11 @@ def config(ctx):
     show_config(ctx.obj)
 
 
+@show.command()
+@click.pass_context
+def events(ctx):
+    cli_show_events(ctx.obj)
+
 @cli.group()
 @click.pass_context
 def fetch(ctx):
@@ -63,6 +69,7 @@ def fetch(ctx):
 @click.pass_context
 def all(ctx):
     fetch_all(ctx.obj)
+
 
 if __name__ == "__main__":
     cli(obj=None)
