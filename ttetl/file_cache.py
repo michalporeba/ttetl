@@ -4,6 +4,7 @@ import time
 
 from model import CacheStats, CachedEntity
 from ttetl.tt_model import Event
+from ttetl.options import DataOptions
 
 
 def stream_data_from(path):
@@ -20,8 +21,8 @@ def stream_data_from(path):
 
 
 class FileCache:
-    def __init__(self, path="data"):
-        self.path = path
+    def __init__(self, options: DataOptions):
+        self.path = options.location
 
     def save_event(self, event):
         path = f"{self.path}/events/"

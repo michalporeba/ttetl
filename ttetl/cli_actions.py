@@ -109,7 +109,7 @@ def show_config(options):
 
 
 def cli_show_events(options):
-    for e in stream_events_from_cache():
+    for e in stream_events_from_cache(options):
         print(e)
 
 
@@ -118,7 +118,7 @@ def fetch_all(options):
     events = 0
     start_time = int(time.time())
 
-    for e in get_events_from_api(options.api, 1722000587):
+    for e in get_events_from_api(options, 1722000587):
         events += 1
         t = f"[{format_duration(int(time.time()-start_time))}]"
         message = f"{t} Fetched {events} events..."

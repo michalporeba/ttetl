@@ -4,7 +4,7 @@ import os
 
 from file_cache import FileCache
 from model import CacheStats
-from options import ApiOptions, TtetlOptions
+from options import ApiOptions, DataOptions, TtetlOptions
 from tt_client import TTClient
 
 logger = logging.getLogger(__name__)
@@ -24,9 +24,9 @@ def get_cache_stats(options: TtetlOptions) -> CacheStats:
     return fc.get_stats()
 
 
-def get_events_from_api(options: ApiOptions, timestamp=None):
-    fc = FileCache()
-    tt = TTClient(options)
+def get_events_from_api(options: TtetlOptions, timestamp=None):
+    fc = FileCache(options.data)
+    tt = TTClient(options.api)
 
     if timestamp is None:
         timestamp = fc.get_event_series_timestamp()
@@ -39,8 +39,8 @@ def get_events_from_api(options: ApiOptions, timestamp=None):
         fc.save_event_series_timestamp(es)
 
 
-def stream_events_from_cache(timestamp=None):
-    fc = FileCache()
+def stream_events_from_cache(options: TtetlOptions, timestamp=None):
+    fc = FileCache(options.data)
     for e in fc.stream_events(timestamp):
         print(e)
         yield e
