@@ -55,9 +55,11 @@ def config(ctx):
 
 
 @show.command()
+@click.option("--from", "-f", help="Date from which to show the events. ISO format.")
+@click.option("--to", "-t", help="Date to which to show the events. ISO format.")
 @click.pass_context
-def events(ctx):
-    cli_show_events(ctx.obj)
+def events(ctx, _from=None, to=None):
+    cli_show_events(ctx.obj, _from, to)
 
 @cli.group()
 @click.pass_context

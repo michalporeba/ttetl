@@ -39,8 +39,11 @@ def get_events_from_api(options: TtetlOptions, timestamp=None):
         fc.save_event_series_timestamp(es)
 
 
-def stream_events_from_cache(options: TtetlOptions, timestamp=None):
+def stream_events_from_cache(options: TtetlOptions, _from=None, to=None):
     fc = FileCache(options.data)
-    for e in fc.stream_events(timestamp):
-        print(e)
+    for e in fc.stream_events(_from):
+        if _from is not None and e.start.unix < _from:
+            continue
+        if to is not None and e.start.unix >= to:
+            continue
         yield e

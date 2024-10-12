@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import time
+import datetime
 
 from actions import (
     get_cache_stats,
@@ -108,8 +109,13 @@ def show_config(options):
     options.accept_printer(printer)
 
 
-def cli_show_events(options):
-    for e in stream_events_from_cache(options):
+def cli_show_events(options, _from, to):
+    if _from is not None:
+        _from = datetime.datetime.strptime(_from, "%Y-%m-%d").timestamp()
+    if to is not None:
+        to = datetime.datetime.strptime(to, "%Y-%m-%d").timedelta(days=1).timestamp()
+
+    for e in stream_events_from_cache(options, _from, to):
         print(e)
 
 
